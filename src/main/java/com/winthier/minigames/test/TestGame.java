@@ -5,6 +5,7 @@ import com.winthier.minigames.game.Game;
 import com.winthier.minigames.util.BukkitFuture;
 import com.winthier.minigames.util.Msg;
 import com.winthier.minigames.util.Players;
+import com.winthier.minigames.util.WorldLoader;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -24,19 +25,18 @@ public class TestGame extends Game implements Listener {
     @Override
     public void onEnable() {
         // Load the test world, with onWorldsLoaded() as callback
-        MinigamesPlugin.getWorldManager().loadWorld(
-            this,
-            "/home/creative/minecraft/worlds/Test/",
-            new BukkitFuture<World>() {
-                @Override public void run() {
-                    onWorldsLoaded(this);
-                }
-            });
+        WorldLoader.loadWorlds(this,
+                         new BukkitFuture<WorldLoader>() {
+                             @Override public void run() {
+                                 onWorldsLoaded(get());
+                             }
+                         },
+                         "/home/creative/minecraft/worlds/Test/");
     }
 
-    void onWorldsLoaded(BukkitFuture<World> future)
+    void onWorldsLoaded(WorldLoader loader)
     {
-        world = future.get();
+        world = loader.getWorld(0);
         // Register all EventHandlers
         MinigamesPlugin.getEventManager().registerEvents(this, this);
         // Call onTick() once per tick.
